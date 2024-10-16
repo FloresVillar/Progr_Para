@@ -3,10 +3,10 @@ import java.io.*;
 import java.util.LinkedList;
 //import java.util.List;
 //import java.util.Scanner;
-public class PC_2_Pc2 {
+public class PC_2_Pc2_paralelo{
     private static String FILENAME = "D.TXT";
-    private static int    M = 10;//filas
-    private static int    N = 4;//columnas
+    private static int M = 10;//filas
+    private static int N = 4;//columnas
     //private static String KEY = "1234";
     private static double CADENA;
     private static int BLOCK = 5; //cantidad de digitos de cada dato , el digito finales " " contando →
@@ -98,12 +98,12 @@ public class PC_2_Pc2 {
         }
     }
 
-    public static void Pregunta2(){//determinante de las submatrices
+    private static void Pregunta2(){//determinante de las submatrices
         WriteData(N);
         AsignarDatosMatriz();
         ImprimirMatriz(A);
         //int menor = M >= N ? N : M;
-        if(M<N){
+        if(M < N){
             //transponer matriz
         }
         //de modo que columnas siempre menor o igual a filas
@@ -111,32 +111,42 @@ public class PC_2_Pc2 {
         int columnas = A[0].length;
         for(int n=2;n<columnas;n++){
             if(n==2){
-                for(int f=0;f<=filas-n;f++){
-                    //asignar elementos  M←A
-                    int g=(int)columnas/n+1;
-                    for(int c=0;c<g;c++){
-                        double [][]M = new double[n][n];
-                        for(int i=0;i<n;i++){
-                            for(int j=0;j<n;j++){
-                                M[i][j] = A[f+i][c*(g-2)+j];
+                Thread hil1 = new Thread(new Runnable (){
+                    public void run(){
+                        final int n=2;
+                        for(int f=0;f<=filas-n;f++){
+                            //asignar elementos  M←A
+                            int g=(int)columnas/n +1;
+                            for(int c=0;c<g;c++){
+                                double [][]M = new double[n][n];
+                                for(int i=0;i<n;i++){
+                                    for(int j=0;j<n;j++){
+                                        M[i][j] = A[f+i][c*(g-2)+j];
+                                    }
+                                }
+                                ImprimirMatriz(M);
+                                Gauss(M);
+                                ImprimirMatriz(M);
+                                //determinante
+                                double det = 1;
+                                for(int k=0;k<M.length;k++){
+                                    det*=M[k][k];
+                                }
+                                System.out.println("determinante de matriz");
+                                System.out.println(det);
+                                System.out.println();
                             }
+                        
                         }
-                        ImprimirMatriz(M);
-                        Gauss(M);
-                        ImprimirMatriz(M);
-                        //determinante
-                        double det = 1;
-                        for(int k=0;k<M.length;k++){
-                            det*=M[k][k];
-                        }
-                        System.out.println("determinante de matriz");
-                        System.out.println(det);
-                        System.out.println();
                     }
-                
-                }
+                });
+                hilos.add(hil1);
+                hil1.start();
             }else{
                 if(n==3){
+                    Thread hil2 = new Thread(new Runnable(){
+                        public void run(){
+                        final int n = 3;        
                     for(int f=0;f<=filas-n;f++){
                         //asignar elementos  M←A
                         int g=(int)columnas/n+1;
@@ -161,8 +171,19 @@ public class PC_2_Pc2 {
                         }
                     
                     }
+                        }
+                    });
+                    hilos.add(hil2);
+                    hil2.start();
                 }
             }
+            for (Thread hil:hilos) {
+				try{
+					hil.join();
+				}catch(InterruptedException e){
+					e.printStackTrace();
+				}						
+			}
         }
     }
     public static void main(String[] args) {
