@@ -4,7 +4,7 @@ import java.util.LinkedList;
 //import java.util.List;
 //import java.util.Scanner;
 public class PC_2_Pc2_paralelo{
-    private static String FILENAME = "D.TXT";
+    private static String FILENAME = "PARALELO.TXT";
     private static int M = 10;//filas
     private static int N = 4;//columnas
     //private static String KEY = "1234";
