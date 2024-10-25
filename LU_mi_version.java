@@ -1,4 +1,4 @@
-import java.io.*;
+//import java.io.*;
 import java.util.*;
 public class LU_mi_version{
 	static int n = 5;

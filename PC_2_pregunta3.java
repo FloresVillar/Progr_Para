@@ -1,5 +1,5 @@
- import java.io.*;
-import javax.swing.*;
+//import java.io.*;
+//import javax.swing.*;
 import java.util.*;
 public class PC_2_pregunta3{
 	static int N = 6;
@@ -19,18 +19,12 @@ public class PC_2_pregunta3{
 		for(int i=0;i<N;i++){
 			for(int j=0;j<N;j++){
 				a[i][j] = rnd.nextDouble() * 100;
-				if(i==j){
-					l_s[i][j]=1;
-				}else{
-					l_s[i][j]=0;
-				}
-				u_s[i][j]=0;
 			}
 			b[i] = rnd.nextDouble() * 100;
 		}
 	}
 	
-	public static LUResult Doolitle(double [][]M){
+	public static Result Doolitle(double [][]M){
 		int n =M.length;
 		double[][] L11 = new double[n][n];
 		double[][] U11 = new double[n][n];
@@ -57,10 +51,10 @@ public class PC_2_pregunta3{
 				U11[i][j]=(M[i][j]-suma)/L11[i][i];
 			}
 		}
-		return new LUResult(L11, U11);
+		return new Result(L11, U11);
 	}
 	  	  
-	public static LUResult LuBloques(double [][]M){
+	public static Result LuBloques(double [][]M){
 		 //cuatro for para la asignacion , ademas se asume que son matrices cuadradas,,, rectangulares ni d cñ 
 	     final Matrices m = new Matrices();
 		 Thread h1 = new Thread(new Runnable(){
@@ -137,7 +131,7 @@ public class PC_2_pregunta3{
 		Imprimir(m.A12);
 		Imprimir(m.A21);
 		Imprimir(m.A22);*/
-		LUResult lu=Doolitle(m.A11); //L11 se tiene del punto anterior  
+		Result lu=Doolitle(m.A11); //L11 se tiene del punto anterior  
 		/*Imprimir(lu.L);
 		Imprimir(lu.U);*/
 		Producto U12 = resolverU(lu.L,m.A12);			//L11 U12 = A12 resolver y hallar U12
@@ -147,12 +141,12 @@ public class PC_2_pregunta3{
 		Producto L21U12 =new Producto(L21.PROD, U12.PROD);
 		m.A22=resta(m.A22 , L21U12.PROD); //actualizacion schur
 		//Imprimir(m.A22);
-		LUResult lu22= Doolitle(m.A22);//llamar a luBloques para el A22
-		double[][]L= ensamblarL(lu.L, L21.PROD, lu22.L);//ensamblar los L    y ensamblar los U								
-		double[][]U=ensamblarU(lu.U, U12.PROD, lu22.U);
-		return new LUResult(L, U);
+		Result lu22= Doolitle(m.A22);//llamar a luBloques para el A22
+		double[][]L= Lglobal(lu.L, L21.PROD, lu22.L);//ensamblar los L    y ensamblar los U								
+		double[][]U= Uglobal(lu.U, U12.PROD, lu22.U);
+		return new Result(L, U);
 	}
-public static double[][] ensamblarL(double[][] L11, double[][] L21, double[][] L22) {
+public static double[][] Lglobal(double[][] L11, double[][] L21, double[][] L22) {
     int n = L11.length + L21.length;
     double[][] L = new double[n][n];
     // Copiar L11
@@ -176,7 +170,7 @@ public static double[][] ensamblarL(double[][] L11, double[][] L21, double[][] L
     return L;
 }
 
-public static double[][] ensamblarU(double[][] U11, double[][] U12, double[][] U22) {
+public static double[][] Uglobal(double[][] U11, double[][] U12, double[][] U22) {
     int n = U11.length + U12.length;
     double[][] U = new double[n][n];
     // Copiar U11
@@ -316,26 +310,24 @@ public static double[][] ensamblarU(double[][] U11, double[][] U12, double[][] U
 //--------------------------------------------------------------------------------------------------
     public static void main(String[] args){
 		Generar();
-		LUResult serial=Doolitle(a);
+		Result serial=Doolitle(a);
 		Imprimir(a);
-		//Imprimir(serial.L);
-		//Imprimir(serial.U);
-		//Imprimir(AxB(serial.L, serial.U));
-		//double[][]aInv = inversa(a);
-		//Imprimir(aInv);
-		//Producto aaInv =new Producto(a, aInv);
-		//Imprimir(aaInv.PROD);
-		LUResult paralelo=LuBloques(a);
+		Imprimir(serial.L);
+		Imprimir(serial.U);
+		Imprimir(AxB(serial.L, serial.U));
+		System.out.println();
+		System.out.println();
+		Result paralelo=LuBloques(a);
 		Imprimir(paralelo.L);
 		Imprimir(paralelo.U);
 		Imprimir(AxB(paralelo.L, paralelo.U));
 	}
 }
 //------------------------------------------------------------------------------------------------------
-class LUResult{
+class Result{
 	double[][]L;
 	double[][]U;
-	public LUResult(double[][] L,double[][] U){
+	public Result(double[][] L,double[][] U){
 		this.L = L;
 		this.U = U;
 	}
